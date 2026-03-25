@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Feedback Analyzer</title>
+</head>
+<body style="text-align:center; margin-top:100px;">
+
+    <h1>Smart Feedback Analyzer</h1>
+
+    <input id="textInput" placeholder="Write something..." style="width:300px; padding:10px;">
+    <button onclick="analyze()">Analyze</button>
+
+    <h2 id="result"></h2>
+    <h3 id="stats"></h3>
+
+    <script>
+        async function analyze() {
+            const text = document.getElementById("textInput").value;
+
+            try {
+                const res = await fetch("http://127.0.0.1:5000/predict", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({text: text})
+                });
+
+                const data = await res.json();
+
+                document.getElementById("result").innerText =
+                    "Result: " + data.prediction;
+
+            } catch (e) {
+                document.getElementById("result").innerText = "ERROR connecting to server";
+                console.log(e);
+            }
+        }
+
+        async function loadStats() {
+            try {
+                const res = await fetch("http://127.0.0.1:5000/stats");
+                const data = await res.json();
+
+                document.getElementById("stats").innerText =
+                    "Dataset: " + data.total + " reviews";
+
+            } catch (e) {
+                document.getElementById("stats").innerText = "Stats not loaded";
+                console.log(e);
+            }
+        }
+
+        loadStats();
+    </script>
+
+</body>
+</html>
